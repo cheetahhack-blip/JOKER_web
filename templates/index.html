@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JOKER Poker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">JOKER Poker</div>
+    <div class="topbar-right">
+      <button id="btnTrophies" class="btn btn-ghost" type="button">実績</button>
+      <button id="btnSettings" class="btn btn-ghost" type="button">設定</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- モード選択 -->
+    <section id="screenMode" class="screen">
+      <h1 class="h1">モードを選択</h1>
+      <p class="muted">文言とジョーカーの見た目が変わる。ゲーム性は同じ。</p>
+
+      <div class="card-grid">
+        <button class="mode-card" data-mode="auditor" type="button">
+          <div class="mode-title">監査官モード</div>
+          <div class="mode-desc">冷淡。確認。処理。</div>
+        </button>
+        <button class="mode-card" data-mode="chogi" type="button">
+          <div class="mode-title">山姥切長義モード</div>
+          <div class="mode-desc">冷静。厳しめ。評価は簡潔。</div>
+        </button>
+        <button class="mode-card" data-mode="goke" type="button">
+          <div class="mode-title">後家兼光モード</div>
+          <div class="mode-desc">軽妙。余裕。観察者。</div>
+        </button>
+      </div>
+
+      <div class="row">
+        <button id="btnModeConfirm" class="btn btn-primary" type="button" disabled>決定</button>
+      </div>
+    </section>
+
+    <!-- ゲーム画面 -->
+    <section id="screenGame" class="screen hidden">
+
+      <!-- 上部ステータス -->
+      <div class="panel">
+        <div class="panel-row">
+          <div class="label">コイン</div>
+          <div id="coinAmount" class="value">0</div>
+        </div>
+
+        <div class="panel-row">
+          <div class="label">ベット</div>
+          <div class="bet">
+            <button id="betMinus" class="btn btn-square" type="button">-</button>
+
+            <input
+                id="betInput"
+                class="bet-input"
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                value="1"
+            />
+
+            <button id="betPlus" class="btn btn-square" type="button">+</button>
+          </div>
+
+        </div>
+
+        <div class="panel-row">
+          <button id="btnNewGame" class="btn btn-ghost" type="button">ニューゲーム（モード再選択）</button>
+        </div>
+      </div>
+
+      <!-- ポーカー領域 -->
+      <div id="pokerArea">
+        <div class="panel">
+          <h2 class="h2">カード</h2>
+
+          <div id="cards" class="cards"></div>
+
+          <div class="row">
+            <button id="btnDeal" class="btn btn-primary" type="button">配る</button>
+            <button id="btnExchange" class="btn" type="button" disabled>交換する</button>
+          </div>
+
+          <div id="message" class="message muted">準備中。</div>
+
+          <!-- ポーカー結果＆ダブルアップ選択 -->
+          <div id="pokerResult" class="panel hidden" style="margin-top:12px;">
+            <div id="pokerSummary" class="poker-summary">-</div>
+            
+            <div class="panel-row">
+              <div class="label">結果</div>
+              <div id="pokerHandName" class="value" style="font-size:16px;">-</div>
+            </div>
+            <div class="panel-row">
+              <div class="label">倍率</div>
+              <div id="pokerMult" class="value" style="font-size:16px;">×0</div>
+            </div>
+            <div class="panel-row">
+              <div class="label">払い戻し</div>
+              <div id="pokerWin" class="value" style="font-size:16px;">0</div>
+            </div>
+
+            <div id="duAsk" class="row" style="justify-content:flex-end;">
+              <button id="btnDuStartYes" class="btn btn-primary" type="button">YES</button>
+              <button id="btnDuStartNo" class="btn" type="button">NO</button>
+            </div>
+
+            <div id="pokerResultMsg" class="message muted"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ダブルアップ領域（ポーカーと排他表示） -->
+      <div id="doubleupArea" class="hidden">
+        <div id="doubleupPanel" class="panel">
+          <div class="panel-row">
+            <div class="label">ダブルアップ</div>
+            <div id="duStatus" class="value" style="font-size:16px;">0連</div>
+          </div>
+
+          <div class="panel-row">
+            <div class="label">現在額</div>
+            <div id="duAmount" class="value" style="font-size:22px;">0</div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <div class="muted" style="margin-bottom:8px;">表カード</div>
+            <div id="duCard" class="card playing">?</div>
+          </div>
+
+          <div id="duGuessRow" class="row">
+            <button id="btnHigh" class="btn btn-primary" type="button">HIGH</button>
+            <button id="btnLow" class="btn btn-primary" type="button">LOW</button>
+          </div>
+
+          <div id="duContinueRow" class="row hidden">
+            <button id="btnDuYes" class="btn btn-primary" type="button">YES</button>
+            <button id="btnDuNo" class="btn" type="button">NO</button>
+          </div>
+
+          <div id="duOkRow" class="row hidden">
+            <button id="btnDuOk" class="btn btn-primary" type="button">OK（ポーカーを続ける）</button>
+          </div>
+
+          <div id="duMsg" class="message muted"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 実績画面 -->
+    <section id="screenTrophies" class="screen hidden">
+      <div class="screen-head">
+        <h1 class="h1">実績</h1>
+        <button id="btnBackFromTrophies" class="btn btn-ghost" type="button">戻る</button>
+      </div>
+      <div class="muted" id="trophyModeLabel" style="margin-bottom:10px;"></div>
+      <div id="trophyList" class="list"></div>
+    </section>
+
+    <!-- 設定画面 -->
+    <section id="screenSettings" class="screen hidden">
+      <div class="screen-head">
+        <h1 class="h1">設定</h1>
+        <button id="btnBackFromSettings" class="btn btn-ghost" type="button">戻る</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-row">
+          <div>
+            <div class="label">効果音</div>
+            <div class="muted">ON/OFF</div>
+          </div>
+          <label class="switch">
+            <input id="toggleSfx" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel danger">
+        <div class="panel-row">
+          <div>
+            <div class="label">実績全消去</div>
+            <div class="muted">全モードの実績が消える。取り消せない。</div>
+          </div>
+          <button id="btnResetTrophies" class="btn btn-danger" type="button">消去</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 実績ポップアップ -->
+  <div id="trophyPopup" class="popup hidden">
+    <div class="popup-card">
+      <div id="trophyPopupTitle" class="popup-title">実績解除</div>
+      <div id="trophyPopupName" class="popup-name">---</div>
+      <div id="trophyPopupDesc" class="popup-desc">---</div>
+      <div id="trophyPopupLine" class="popup-line muted">---</div>
+      <div class="row" style="justify-content:flex-end;">
+        <button id="btnTrophyPopupOk" class="btn btn-primary" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 効果音 -->
+  <audio id="sfxOk"  preload="auto" src="{{ url_for('static', filename='sfx/ok.wav') }}"></audio>
+  <audio id="sfxNg"  preload="auto" src="{{ url_for('static', filename='sfx/ng.wav') }}"></audio>
+  <audio id="sfxPay" preload="auto" src="{{ url_for('static', filename='sfx/payout.wav') }}"></audio>
+  <audio id="sfxSp"  preload="auto" src="{{ url_for('static', filename='sfx/special.wav') }}"></audio>
+
+  <!-- scripts -->
+  <script defer src="{{ url_for('static', filename='js/storage.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/ui.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/achievements.js') }}"></script>
+
+  <script defer src="{{ url_for('static', filename='js/text/ja_auditor.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/text/ja_chogi.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/text/ja_goke.js') }}"></script>
+
+  <script defer src="{{ url_for('static', filename='js/poker.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/doubleup.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
