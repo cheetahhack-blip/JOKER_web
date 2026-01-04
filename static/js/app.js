@@ -100,6 +100,14 @@
       img.alt = "JOKER";
       img.src = `/static/img/joker_${mode}.png`;
       el.appendChild(img);
+
+      // ジョーカーでも HOLD バッジを出す
+      if (showHold && held) {
+        const badge = document.createElement("div");
+        badge.className = "hold-badge";
+        badge.textContent = "HOLD";
+        el.appendChild(badge);
+      }
       return;
     }
 
