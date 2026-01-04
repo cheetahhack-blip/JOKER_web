@@ -250,7 +250,7 @@
     SFX.play(SFX.pay);
     UI.setMessage(`${payoutMsg}\n+${UI.formatCoins(amount)}`, false);
 
-    if (amount >= 2500000) Achievements.unlockAndQueue(["m4_bigwin_250m"]);
+    if (amount >= 400000) Achievements.unlockAndQueue(["m4_bigwin_250m"]);
     Achievements.checkCoinMilestones();
 
     Game.pendingWin = 0;
@@ -419,6 +419,70 @@
     }
   }
 
+    function getPaytableRows(){
+      // poker.js 側に定義があればそれを優先
+      const pt = Poker.PAYTABLE || Poker.paytable || Poker.PAY_TABLE || null;
+
+      // 期待する形式例：
+      // [{ key:"two_pair", name:"ツーペア", mult:2 }, ...]
+      if (Array.isArray(pt) && pt.length) {
+        return pt.map(x => ({
+          key: x.key,
+          name: x.name || x.label || x.title || x.key,
+          mult: Number(x.mult ?? x.multiplier ?? 0)
+        }));
+      }
+
+      // なければフォールバック（あなたの仕様に合わせた版）
+      return [
+        { key:"high_card",  name:"役なし", mult:0 },
+        { key:"one_pair",   name:"ワンペア", mult:0 },
+        { key:"two_pair",   name:"ツーペア", mult:2 },
+        { key:"three_kind", name:"スリーカード", mult:3 },
+        { key:"straight",   name:"ストレート", mult:4 },
+        { key:"flush",      name:"フラッシュ", mult:6 },
+        { key:"full_house", name:"フルハウス", mult:9 },
+        { key:"four_kind",  name:"フォーカード", mult:25 },
+        { key:"straight_flush", name:"ストレートフラッシュ", mult:50 },
+        { key:"royal",      name:"ロイヤルストレートフラッシュ", mult:250 },
+        { key:"five_kind",  name:"ファイブカード", mult:500 }, // ★ここは×500で固定
+      ];
+    }
+
+    function renderPaytable(){
+      const list = $("#paytableList");
+      if (!list) return;
+
+      const rows = getPaytableRows();
+
+      // 表示順は「弱い→強い」に寄せる（フォールバックも含めて）
+      const order = [
+        "high_card","one_pair","two_pair","three_kind","straight","flush","full_house",
+        "four_kind","straight_flush","royal","five_kind"
+      ];
+      rows.sort((a,b) => {
+        const ia = order.indexOf(a.key);
+        const ib = order.indexOf(b.key);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+        return (a.mult ?? 0) - (b.mult ?? 0);
+      });
+
+      list.innerHTML = "";
+      rows.forEach(r => {
+        const item = document.createElement("div");
+        item.className = "list-item";
+        item.innerHTML = `
+          <div>
+            <div class="list-title">${r.name}</div>
+          </div>
+          <div style="font-weight:900; font-size:16px;">×${r.mult}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
   function boot() {
     Storage.initIfNeeded();
     SFX.init();
@@ -441,6 +505,12 @@
       Achievements.renderTrophies();
       UI.showScreen("screenTrophies");
     });
+    $("#btnPaytable").addEventListener("click", () => {
+      renderPaytable();
+      UI.showScreen("screenPaytable");
+    });
+    $("#btnBackFromPaytable").addEventListener("click", () => UI.showScreen(getMode() ? "screenGame" : "screenMode"));
+
     $("#btnSettings").addEventListener("click", () => UI.showScreen("screenSettings"));
 
     $("#btnBackFromTrophies").addEventListener("click", () => UI.showScreen(getMode() ? "screenGame" : "screenMode"));

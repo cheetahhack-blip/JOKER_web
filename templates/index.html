@@ -10,6 +10,7 @@
   <header class="topbar">
     <div class="brand">JOKER Poker</div>
     <div class="topbar-right">
+      <button id="btnPaytable" class="btn btn-ghost" type="button">役表</button>
       <button id="btnTrophies" class="btn btn-ghost" type="button">実績</button>
       <button id="btnSettings" class="btn btn-ghost" type="button">設定</button>
     </div>
@@ -167,6 +168,19 @@
       </div>
       <div class="muted" id="trophyModeLabel" style="margin-bottom:10px;"></div>
       <div id="trophyList" class="list"></div>
+    </section>
+
+    <!-- 役倍率表 -->
+    <section id="screenPaytable" class="screen hidden">
+      <div class="screen-head">
+        <h1 class="h1">役倍率表</h1>
+        <button id="btnBackFromPaytable" class="btn btn-ghost" type="button">戻る</button>
+      </div>
+
+      <div class="panel">
+        <div class="muted" style="margin-bottom:10px;">ポーカー（ジョーカーあり）の倍率。</div>
+        <div id="paytableList" class="list"><!-- JSで描画 --></div>
+      </div>
     </section>
 
     <!-- 設定画面 -->
