@@ -191,14 +191,27 @@
 
   function updateDoubleUpUI() {
     const mode = getMode();
-    const txt = (window.TEXT && mode && window.TEXT[mode]) ? window.TEXT[mode].doubleup : null;
+    const txt = (window.TEXT && mode && window.TEXT[mode])
+      ? window.TEXT[mode].doubleup
+      : null;
 
+    // 連数
     const status = $("#duStatus");
+    if (status) {
+      status.textContent = `${Game.duStreak}連`;
+    }
+
+    // 現在額
     const amount = $("#duAmount");
+    if (amount) {
+      amount.textContent = UI.formatCoins(Game.duAmount);
+    }
+
+    // 表カード
     const card = $("#duCard");
     if (card && Game.duPrev) {
-      card.className = "card playing"; // 念のためリセット
-      renderPlayingCard(card, Game.duPrev, { mode: getMode() || "auditor" });
+      card.className = "card playing";
+      renderPlayingCard(card, Game.duPrev, { mode: mode || "auditor" });
     }
   }
 
