@@ -460,13 +460,13 @@
         "high_card","one_pair","two_pair","three_kind","straight","flush","full_house",
         "four_kind","straight_flush","royal","five_kind"
       ];
-      rows.sort((a,b) => {
-        const ia = order.indexOf(a.key);
-        const ib = order.indexOf(b.key);
-        if (ia !== -1 && ib !== -1) return ia - ib;
-        if (ia !== -1) return -1;
-        if (ib !== -1) return 1;
-        return (a.mult ?? 0) - (b.mult ?? 0);
+      rows.sort((a, b) => {
+        const ma = Number(a.mult ?? 0);
+        const mb = Number(b.mult ?? 0);
+        if (ma !== mb) return ma - mb;
+
+        // 同倍率のときだけ安定化（名前順）
+        return String(a.name).localeCompare(String(b.name), "ja");
       });
 
       list.innerHTML = "";

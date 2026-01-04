@@ -9,13 +9,13 @@ window.getMode = function () {
 };
 
 window.UI = {
-  showScreen(id) {
-    const screens = ["screenMode", "screenGame", "screenTrophies", "screenSettings"];
-    screens.forEach(s => {
-      const el = $("#" + s);
-      if (el) el.classList.add("hidden");
+  showScreen(id){
+    // すべての screen を一括で隠して、指定だけ表示
+    document.querySelectorAll(".screen").forEach(sec => {
+      sec.classList.add("hidden");
     });
-    const target = $("#" + id);
+
+    const target = document.getElementById(id);
     if (target) target.classList.remove("hidden");
   },
 
